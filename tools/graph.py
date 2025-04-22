@@ -14,7 +14,7 @@ class ClosenessData(BaseModel):
 
 # Step 2: Plot and Save Function
 def generate_graph(graph_data: List[ClosenessData]):
-    filename: str = "closeness_centrality.png"
+    filename: str = "output.png"
     user_names = [entry.user_name for entry in graph_data]
     centrality_values = [entry.closeness_centrality for entry in graph_data]
 

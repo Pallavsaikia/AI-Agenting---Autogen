@@ -6,3 +6,5 @@ output.py
 __pycache__/
 app.log
 output.py
+output.png
+output.jpg

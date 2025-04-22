@@ -4,9 +4,18 @@ from tools.get_db_data import get_all_user_survey_data_from_database
 from tools.graph import generate_graph
 from dotenv import load_dotenv
 import os
+from typing import List, Sequence
+
+from autogen_agentchat.agents import AssistantAgent, UserProxyAgent
+from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
+from autogen_agentchat.messages import BaseAgentEvent, BaseChatMessage
+from autogen_agentchat.teams import SelectorGroupChat
+from autogen_agentchat.ui import Console
+from autogen_ext.models.openai import OpenAIChatCompletionClient
+
 load_dotenv()
 
-kv_client = KeyVaultClient("kv-bbd-dev")
+kv_client = KeyVaultClient("xyz")
 DB = kv_client.get_secret("SqlDBName")
 USER = kv_client.get_secret("SqlDBUser")
 PASSWORD = kv_client.get_secret("SqlDbPassword")
@@ -16,14 +25,7 @@ SQLConnectionSettings.set_config(HOST,DB,USER,PASSWORD)
 # print(get_all_user_survey_data_from_database("Network Survey"))
 
 
-from typing import List, Sequence
 
-from autogen_agentchat.agents import AssistantAgent, UserProxyAgent
-from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
-from autogen_agentchat.messages import BaseAgentEvent, BaseChatMessage
-from autogen_agentchat.teams import SelectorGroupChat
-from autogen_agentchat.ui import Console
-from autogen_ext.models.openai import OpenAIChatCompletionClient
 model_client = OpenAIChatCompletionClient(model="gpt-4o-mini",api_key=os.getenv("OPEN_AI_API_KEY"))
 
 
