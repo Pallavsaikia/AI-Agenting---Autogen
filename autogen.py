@@ -31,39 +31,79 @@ model_client = OpenAIChatCompletionClient(model="gpt-4o-mini",api_key=os.getenv(
 
 planning_agent = AssistantAgent(
     "PlanningAgent",
-    description="An agent for planning tasks, this agent should be the first to engage when given a new task.Follow each step",
+    description="The coordinator agent responsible for task orchestration.",
     model_client=model_client,
     system_message="""
-    You are a planning agent.
-    You Route Task to appropriate agent
-    1.DatabaseSearchAgent for searching data.
-    2.GraphAgents is for generating the graph with the json data from the DatabaseSearchAgent
-    3.After graph is successfully generated end the conversation with "TERMINATE".
-    """,
+    You are the PlanningAgent.
+
+    Your job is to coordinate other agents with the following process:
+
+    1. **Retrieve data first** using **DatabaseSearchAgent**. 
+    2. Once the data is retrieved, call **GraphAgent** and provide the data so it can generate the required graph.
+    3. After graph generation is completed, **DO NOT** take further action. Wait for the user prompt. Do NOT continue the conversation on your own.
+
+    **Important Notes:**
+    - Ensure data retrieval is successful before triggering graph generation.
+    - Do not trigger any actions until you have valid data for graph generation.
+    - Once the graph is generated, you MUST stop. Do NOT continue the conversation unless explicitly triggered by a new user input.
+    - **Use the SummarizerAgent ONLY when requested by the user**. The SummarizerAgent should not be used unless the user specifically asks for a summary.
+    - **Do not** initiate any other action unless the user explicitly requests it.
+
+    In short, your sequence of actions will be:
+    - Data retrieval from **DatabaseSearchAgent**.
+    - Graph generation with **GraphAgent** (after receiving valid data).
+    - After the graph is generated, you must **STOP** and **WAIT** for the user to ask for further action.
+
+    Follow these instructions precisely.
+    """
 )
 
 database_search_agent = AssistantAgent(
     "DatabaseSearchAgent",
-    description="An agent that retrieves data from Database using tools.Respond only the json",
+    description="Fetches user survey data from the database using available tools.",
     tools=[get_all_user_survey_data_from_database],
     model_client=model_client,
     system_message="""
-    You are a Database RAG agent.
-    Use tools at your disposal to fetch data required.
-    Respond the data in indented Json format.
-    """,
-)
+    You are the DatabaseSearchAgent.
 
+    Your role is to fetch structured JSON data using the provided tools. Do not respond with explanations or commentary.
+
+    Only respond with the raw JSON data retrieved. Ensure it is:
+    - Properly indented
+    - Valid JSON
+    - Contains all necessary information requested
+
+    Do not do anything else.
+    """
+)
+summarizer_agent = AssistantAgent(
+    "SummarizerAgent",
+    description="An agent that summarizes the conversation or data when explicitly requested by the user.",
+    tools=[get_all_user_survey_data_from_database],
+    model_client=model_client,
+    system_message="""
+    You are a Summarizer agent.
+    You summarize the conversation or provide insights from data only when explicitly requested by the user.
+    Do not engage unless the user asks for a summary.
+    """
+)
 graph_agent = AssistantAgent(
     "GraphAgent",
-    description="An agent uses tools to generate graph",
+    description="Generates a graph from JSON data using the provided tool.",
     model_client=model_client,
     tools=[generate_graph],
     system_message="""
-    You are a Graph Generator agent.
-    You take the json out from previous agent and use tool to generate graph.
-    Respond back exactly with: 'Graph is Generated.'
-    """,
+    You are the GraphAgent.
+
+    Your task is to take in the JSON data provided by the DatabaseSearchAgent and use your tool to generate a graph.
+
+    Once the graph is successfully generated, respond with:
+    - The exact phrase: "Graph is Generated."
+
+    Do not respond with explanations or additional text. Do not proceed to call any other agent.
+
+    Only do the graph generation and confirm completion with the expected phrase.
+    """
 )
 
 text_mention_termination = TextMentionTermination("TERMINATE")

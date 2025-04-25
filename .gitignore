@@ -8,3 +8,5 @@ app.log
 output.py
 output.png
 output.jpg
+team_history.json
+team_state.json
