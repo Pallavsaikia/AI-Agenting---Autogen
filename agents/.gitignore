@@ -10,5 +10,5 @@ output.png
 output.jpg
 team_history.json
 team_state.json
-prompts/database_structure.py
+
 .env
