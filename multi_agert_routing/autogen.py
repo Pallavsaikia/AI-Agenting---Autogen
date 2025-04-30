@@ -12,7 +12,7 @@ from autogen_agentchat.messages import BaseAgentEvent, BaseChatMessage
 from autogen_agentchat.teams import SelectorGroupChat
 from autogen_agentchat.ui import Console
 from autogen_ext.models.openai import OpenAIChatCompletionClient
-
+from autogen_ext.models.openai import AzureOpenAIChatCompletionClient
 load_dotenv()
 
 kv_client = KeyVaultClient("kv-bbd-dev")
@@ -25,9 +25,16 @@ SQLConnectionSettings.set_config(HOST,DB,USER,PASSWORD)
 # print(get_all_user_survey_data_from_database("Network Survey"))
 
 
-
-model_client = OpenAIChatCompletionClient(model="gpt-4o-mini",api_key=os.getenv("OPEN_AI_API_KEY"))
-
+from autogen_core.models import ChatCompletionClient,ModelInfo,ModelFamily
+model_client=AzureOpenAIChatCompletionClient(
+    azure_deployment="gpt-4o-mini",
+    model="gpt-4o-mini",
+    api_version="2024-06-01",
+    azure_endpoint=os.getenv("AZURE_AI_ENDPOINT"),
+    api_key=os.getenv("AZURE_OPEN_AI_KEY"),
+    
+)
+# model_client = OpenAIChatCompletionClient(model="gpt-4o-mini",api_key=os.getenv("OPEN_AI_API_KEY"))
 
 planning_agent = AssistantAgent(
     "PlanningAgent",
@@ -63,6 +70,7 @@ database_search_agent = AssistantAgent(
     description="Fetches user survey data from the database using available tools.",
     tools=[get_all_user_survey_data_from_database],
     model_client=model_client,
+    # output_content_type=
     system_message="""
     You are the DatabaseSearchAgent.
 
@@ -135,8 +143,8 @@ async def main():
     task = '''1. Get all survey data from the database. Survey name is Network Survey and category name is Operations. Generate the graph with the data.'''
     
     try:
-        a=await team.run(task=task)
-        print(a.messages[0])
+        # a=await team.run(task=task)
+        # print(a.messages[0])
         await Console(team.run_stream(task=task))
      
     except Exception as e:

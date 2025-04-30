@@ -1,0 +1,14 @@
+.venv
+.dev-venv
+
+.cache
+output.py
+__pycache__/
+app.log
+output.py
+output.png
+output.jpg
+team_history.json
+team_state.json
+prompts/database_structure.py
+.env
