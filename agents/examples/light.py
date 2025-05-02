@@ -16,42 +16,42 @@ from semantic_kernel.functions import kernel_function
 from dotenv import load_dotenv
 import os
 
-from prompts.tables_structure import TABLE_STRUCTURE_SYSTEM_PROMPT
+# from prompts.tables_structure import TABLE_STRUCTURE_SYSTEM_PROMPT
 load_dotenv()
 
-# class LightsPlugin:
-#     lights = [
-#         {"id": 1, "name": "Table Lamp", "is_on": False},
-#         {"id": 2, "name": "Porch light", "is_on": False},
-#         {"id": 3, "name": "Chandelier", "is_on": True},
-#     ]
+class LightsPlugin:
+    lights = [
+        {"id": 1, "name": "Table Lamp", "is_on": False},
+        {"id": 2, "name": "Porch light", "is_on": False},
+        {"id": 3, "name": "Chandelier", "is_on": True},
+    ]
 
-#     @kernel_function(
-#         name="get_lights",
-#         description="Gets a list of lights and their current state",
+    @kernel_function(
+        name="get_lights",
+        description="Gets a list of lights and their current state",
         
-#     )
-#     def get_state(
-#         self,
-#     ) -> str:
-#         """Gets a list of lights and their current state."""
-#         return self.lights
+    )
+    def get_state(
+        self,
+    ) -> str:
+        """Gets a list of lights and their current state."""
+        return self.lights
 
-#     @kernel_function(
-#         name="change_state",
-#         description="Changes the state of the light",
-#     )
-#     def change_state(
-#         self,
-#         id: int,
-#         is_on: bool,
-#     ) -> str:
-#         """Changes the state of the light."""
-#         for light in self.lights:
-#             if light["id"] == id:
-#                 light["is_on"] = is_on
-#                 return light
-#         return None
+    @kernel_function(
+        name="change_state",
+        description="Changes the state of the light",
+    )
+    def change_state(
+        self,
+        id: int,
+        is_on: bool,
+    ) -> str:
+        """Changes the state of the light."""
+        for light in self.lights:
+            if light["id"] == id:
+                light["is_on"] = is_on
+                return light
+        return None
 
 
 async def main():
@@ -77,11 +77,11 @@ async def main():
     setup_logging()
     logging.getLogger("kernel").setLevel(logging.DEBUG)
 
-    # Add a plugin
-    # kernel.add_plugin(
-    #     LightsPlugin(),
-    #     plugin_name="Lights",
-    # )
+
+    kernel.add_plugin(
+        LightsPlugin(),
+        plugin_name="Lights",
+    )
     
     # Enable planning
     execution_settings = AzureChatPromptExecutionSettings()
@@ -89,8 +89,6 @@ async def main():
 
     # Create a history of the conversation
     history = ChatHistory()
-    history.add_system_message("you are a query developer. Who specializes in creating sql query")
-    history.add_system_message(TABLE_STRUCTURE_SYSTEM_PROMPT)
     # Initiate a back-and-forth chat
     userInput = None
     while True:

@@ -13,10 +13,11 @@ from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_
 import logging
 from typing import Annotated
 from semantic_kernel.functions import kernel_function
+
+from prompts.database_train_prompt import DatabaseTrainPrompt
+from prompts.database_structure import TABLE_STRUCTURE_SYSTEM_PROMPT
 from dotenv import load_dotenv
 import os
-from prompts.database_train_prompt import DatabaseTrainPrompt
-from prompts.tables_structure import TABLE_STRUCTURE_SYSTEM_PROMPT
 load_dotenv()
 
 
